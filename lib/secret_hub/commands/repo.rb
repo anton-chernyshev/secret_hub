@@ -40,13 +40,21 @@ module SecretHub
       end
 
       def save_command
-        case type
-        when 'secrets'
-          github.put_secret(repo, key, value)
-        when 'variables'
-          github.put_variable(repo, key, value)
+        begin
+          case type
+          when 'secrets'
+            github.put_secret(repo, key, value)
+          when 'variables'
+            github.put_variable(repo, key, value)
+          end
+          say "Saved b`#{repo}` m`#{key}`"
+        rescue APIError => e
+          if e.message.include?('409') && e.message.include?('Already exists')
+            say "Skipped b`#{repo}` m`#{key}` (already exists)"
+          else
+            raise
+          end
         end
-        say "Saved b`#{repo}` m`#{key}`"
       end
 
       def delete_command

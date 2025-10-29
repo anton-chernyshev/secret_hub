@@ -40,13 +40,21 @@ module SecretHub
       end
 
       def save_command
-        case type
-        when 'secrets'
-          github.put_org_secret(org, key, value)
-        when 'variables'
-          github.put_org_variable(org, key, value)
+        begin
+          case type
+          when 'secrets'
+            github.put_org_secret(org, key, value)
+          when 'variables'
+            github.put_org_variable(org, key, value)
+          end
+          say "Saved b`#{org}` m`#{key}`"
+        rescue APIError => e
+          if e.message.include?('409') && e.message.include?('Already exists')
+            say "Skipped b`#{org}` m`#{key}` (already exists)"
+          else
+            raise
+          end
         end
-        say "Saved b`#{org}` m`#{key}`"
       end
 
       def delete_command

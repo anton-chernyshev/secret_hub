@@ -130,6 +130,16 @@ patch '/repos/:owner/:repo/actions/variables/:name' do
   end
 end
 
+# PATCH Variable 
+patch '/repos/:owner/:repo/actions/variables/:name' do
+  if %w[matz user].include? params[:owner]
+    status 200
+    ''
+  else
+    halt 500, 'some error'
+  end
+end
+
 # PUT Org Variable
 put '/orgs/:org/actions/variables/:name' do
   if %w[matz user].include? params[:org]

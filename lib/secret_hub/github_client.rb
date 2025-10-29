@@ -73,6 +73,9 @@ module SecretHub
         patch "/repos/#{repo}/actions/variables/#{name}",
           name: name,
           value: value
+      elsif e.message.include?('409')
+        # 409 means variable already exists - let this bubble up to be handled by caller
+        raise
       else
         raise
       end

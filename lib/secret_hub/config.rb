@@ -58,7 +58,7 @@ module SecretHub
 
       case secrets
       when Hash
-        secrets.to_h { |key, value| [key, value || ENV[key]] }
+        secrets.to_h { |key, value| [key, (value || ENV[key])&.to_s] }
       when Array
         secrets.to_h { |key| [key, ENV[key]] }
       end

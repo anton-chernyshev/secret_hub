@@ -128,13 +128,22 @@ module SecretHub
         items.each do |key, value|
           say "save    m`#{key}`  "
           if value
-            case type
-            when 'secrets'
-              github.put_secret(repo, key, value) unless dry
-            when 'variables'
-              github.put_variable(repo, key, value) unless dry
+            begin
+              case type
+              when 'secrets'
+                github.put_secret(repo, key, value) unless dry
+              when 'variables'
+                github.put_variable(repo, key, value) unless dry
+              end
+              say 'g`OK`'
+            rescue APIError => e
+              if e.message.include?('409') && e.message.include?('Already exists')
+                say 'y`SKIPPED` (already exists)'
+                skipped += 1
+              else
+                raise
+              end
             end
-            say 'g`OK`'
           else
             say 'r`MISSING`'
             skipped += 1
